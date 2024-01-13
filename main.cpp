@@ -8,8 +8,8 @@ std::vector<MenuItem> displayOptions = {{"display matrix", {}},
                                         {"exit", {}}};
 
 std::vector<MenuItem> geneticAlgorithmOptions = {{"set population size", {}},
-                                                 {"set mutation probability", {}},
-                                                 {"set crossover probability", {}},
+                                                 {"set mutation factor", {}},
+                                                 {"set crossover factor", {}},
                                                  {"set stop time",{}},
                                                  {"method of crossover",{}},
                                                  {"method of mutation",{}},

@@ -60,12 +60,12 @@ int Graph::getNeighborhoodChoice() const
 
 float Graph::getMutationProbability() const
 {
-    return mutationProbability;
+    return mutationFactor;
 }
 
 float Graph::getCrossoverProbability() const
 {
-    return crossoverProbability;
+    return crossoverFactor;
 }
 
 int Graph::getPopulationSize() const
@@ -145,9 +145,9 @@ void Graph::setPopulationSize(int populationSize)
     this->populationSize = populationSize;
 }
 
-void Graph::setCrossoverProbability(float crossoverProbability)
+void Graph::setCrossoverFactor(float crossoverProbability)
 {
-    this->crossoverProbability = crossoverProbability;
+    this->crossoverFactor = crossoverProbability;
 }
 
 void Graph::setCrossoverMethod(int crossoverMethod)
@@ -194,7 +194,7 @@ std::vector<std::vector<int>> Graph::createInitialPopulation(int populationSize,
     std::vector<int> path;
 
     for (int i = 0; i < numVertices; i++)
-            path.push_back(i);
+        path.push_back(i);
 
     for (int i = 0; i < populationSize; i++)
     {
@@ -206,6 +206,31 @@ std::vector<std::vector<int>> Graph::createInitialPopulation(int populationSize,
     }
 
     return population;
+}
+
+std::vector<int> Graph::calculateCosts(std::vector<std::vector<int>> &population)
+{
+    std::vector<int> costs;
+    for (auto &path : population)
+    {
+        costs.push_back(getPathCost(path));
+    }
+    return costs;
+}
+
+std::vector<int> Graph::getBestPath(std::vector<std::vector<int>> &population, std::vector<int> &costs)
+{
+    int minCost = INT_MAX;
+    int minCostIndex = 0;
+    for (int i = 0; i < costs.size(); i++)
+    {
+        if (costs[i] < minCost)
+        {
+            minCost = costs[i];
+            minCostIndex = i;
+        }
+    }
+    return population[minCostIndex];
 }
 
 // crossover method - crossoverMethod = 1 - order crossover, crossoverMethod = 2 - partially mapped crossover
@@ -286,9 +311,9 @@ void Graph::getGreedyPath(std::vector<int> &path, int &totalWeight, int startVer
     greedyPath = path;
 }
 
-void Graph::setMutationProbability(float mutationProbability)
+void Graph::setMutationFactor(float mutationProbability)
 {
-    this->mutationProbability = mutationProbability;
+    this->mutationFactor = mutationProbability;
 }
 
 std::vector<int> Graph::tournamentSelection(const std::vector<std::vector<int>> &population, int tournamentSize)
@@ -322,61 +347,69 @@ void Graph::geneticMutation(std::vector<int> &path, int &totalWeight, long &time
     RandomGenerator randomGenerator;
 
     std::vector<std::vector<int>> population;
+    std::vector<int> populationCosts;
 
     population = createInitialPopulation(populationSize, totalWeight);
+    populationCosts = calculateCosts(population);
 
-    sortPopulation(population);
-
-    std::vector<int> bestPath = population[0];
+    std::vector<int> bestPath = getBestPath(population, populationCosts);
     totalWeight = getPathCost(bestPath);
 
     int tournamentSize = 5;
 
+    int generation = 0;
+
     auto currentTime = std::chrono::high_resolution_clock::now();
     while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - currentTime).count() < stopTime)
     {
-
+        generation++;
         std::vector<std::vector<int>> newPopulation;
-        // Sort the current population
-        sortPopulation(population);
 
-        // Determine the number of elites
-        int numElites = 0.1 * populationSize;
-
-        for (int i = 0; i < numElites; i++)
+        for (int i = 0; i < populationSize; i++)
         {
-            newPopulation.push_back(population[i]);
+            std::vector<int> parent1 = tournamentSelection(population, tournamentSize);
+            newPopulation.push_back(parent1);
         }
+        int numCrossover = static_cast<int>(newPopulation.size() * crossoverFactor);
 
-        for (int i = numElites; i < populationSize; i++)
+        for (int i = 0; i < numCrossover; i++)
         {
-            // crossover
-            if (randomGenerator.generateRandomInt(0, 100) < crossoverProbability * 100)
+            int index1 = randomGenerator.generateRandomInt(0, newPopulation.size() - 1);
+            int index2 = randomGenerator.generateRandomInt(0, newPopulation.size() - 1);
+
+            while (index1 == index2)
             {
-                std::vector<int> parent1 = tournamentSelection(population, tournamentSize);
-                std::vector<int> parent2 = tournamentSelection(population, tournamentSize);
-                std::vector<int> newPath = crossover(parent1, parent2);
-                std::vector<int> newPath2 = crossover(parent2, parent1);
-                newPopulation.push_back(newPath);
-                newPopulation.push_back(newPath2);
+                index2 = randomGenerator.generateRandomInt(0, newPopulation.size() - 1);
             }
 
-            // mutation
-            if (randomGenerator.generateRandomInt(0, 100) < mutationProbability * 100)
-            {
-                mutation(newPopulation[newPopulation.size() - 1]);
-            }
+            std::vector<int> offspring1 = crossover(newPopulation[index1], newPopulation[index2]);
+            std::vector<int> offspring2 = crossover(newPopulation[index2], newPopulation[index1]);
+
+            newPopulation[index1] = offspring1;
+            newPopulation[index2] = offspring2;
         }
+
+        int numMutation = static_cast<int>(newPopulation.size() * mutationFactor);
+
+        for (int i = 0; i < numMutation; i++)
+        {
+            int index = randomGenerator.generateRandomInt(0, newPopulation.size() - 1);
+
+            mutation(newPopulation[index]);
+        }
+
         population = newPopulation;
-        sortPopulation(population);
-        bestPath = population[0];
+        bestPath = getBestPath(population, populationCosts);
 
         path = bestPath;
 
         if (totalWeight > getPathCost(bestPath))
         {
             totalWeight = getPathCost(bestPath);
-            printPath(bestPath);
-        }
+            time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - currentTime).count();
+        //     printPath(bestPath);
+        //      std::cout << "Time: " << time << '\n';
+        //     std::cout << "Generation: " << generation << '\n';
+         }
     }
 }

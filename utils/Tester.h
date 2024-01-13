@@ -7,6 +7,7 @@
 #include "Timer.h"
 #include <fstream>
 #include "../Graph.h"
+#include <string>
 #include "RandomGenerator.h"
 class Tester
 {
@@ -16,7 +17,8 @@ public:
     void printResultsToFile(std::string fileName); // method for printing results to file
 
     Graph* loadGraphFromFile(std::string fileName); // method for loading graph from file
-
+    
+    void runTests(std::string fileName, int stopTime, int crossoverMethod, int mutationMethod,  float crossoverFactor, float mutationFactor, int populationSize); // method for running tests
 private:
     int numOfTests;
     std::vector<std::vector<int>> paths;

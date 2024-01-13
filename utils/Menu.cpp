@@ -26,9 +26,9 @@ bool Menu::run()
                 std::cout << i++ << ". " << item.str << " (" << graph->getStopTime() << " seconds)" << '\n';
             else if (item.str == "set neighborhood")
                 std::cout << i++ << ". " << item.str << " (" << graph->getNeighborhoodChoice() << ")" << '\n';
-            else if (item.str == "set mutation probability")
+            else if (item.str == "set mutation factor")
                 std::cout << i++ << ". " << item.str << " (" << graph->getMutationProbability() << ")" << '\n';
-            else if (item.str == "set crossover probability")
+            else if (item.str == "set crossover factor")
                 std::cout << i++ << ". " << item.str << " (" << graph->getCrossoverProbability() << ")" << '\n';
             else if (item.str == "set population size")
                 std::cout << i++ << ". " << item.str << " (" << graph->getPopulationSize() << ")" << '\n';
@@ -118,8 +118,6 @@ bool Menu::run()
                         std::cout << vertex << " ";
                     std::cout << '\n';
 
-      
-
                     waitForUser();
                 }
                 else if (chosenItemString == "set stop time")
@@ -138,13 +136,13 @@ bool Menu::run()
                 {
                     graph->setPopulationSize(getIntInput("Enter population size: "));
                 }
-                else if (chosenItemString == "set mutation probability")
+                else if (chosenItemString == "set mutation factor")
                 {
-                    graph->setMutationProbability(getFloatInput("Enter mutation probability: "));
+                    graph->setMutationFactor(getFloatInput("Enter mutation factor: "));
                 }
-                else if (chosenItemString == "set crossover probability")
+                else if (chosenItemString == "set crossover factor")
                 {
-                    graph->setCrossoverProbability(getFloatInput("Enter crossover probability: "));
+                    graph->setCrossoverFactor(getFloatInput("Enter crossover factor: "));
                 }
                 else if (chosenItemString == "method of crossover")
                 {
@@ -169,22 +167,14 @@ bool Menu::run()
        
                     waitForUser();
                 }
-                // else if (chosenItemString == "run algorithm" && menuName == "simulated annealing algorithm")
-                // {
-                //     std::vector<int> path;
-                //     int totalWeight = 0;
-                //     long time = 0;
-                //     graph->simulatedAnnealing(path, totalWeight, 0, time);
-                //     std::cout << "Total cost: " << totalWeight << '\n';
-                //     std::cout << "Path: ";
-                //     for (auto &vertex : path)
-                //         std::cout << vertex << " ";
-                //     std::cout << '\n';
-                //      waitForUser();
-                // }
+                
                 else if (chosenItemString == "test genetic algorithm")
                 {
-                    Tester tester(10);
+                    Tester tester(5);
+                    int populationSize = getIntInput("Enter population size: ");
+                    tester.runTests("ftv47.atsp", 120, 1, 1, 0.8, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240, 1, 1, 0.8, 0.01, populationSize);
+                    tester.runTests("rbg403.atsp", 360, 1, 1, 0.8, 0.01, populationSize);
                 }
     
                 else if (chosenItemString == "display graph")
@@ -213,6 +203,7 @@ void Menu::waitForUser()
     std::cin.clear();
     std::cin.ignore(INT_MAX, '\n');
     std::cout << "Press any key to continue . . .\n";
+
     std::cin.get();
 }
 // gets int input from user

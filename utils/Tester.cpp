@@ -1,5 +1,5 @@
 #include "Tester.h"
-
+#include <string>
 Tester::Tester(int numOfTests) : numOfTests(numOfTests)
 {
 }
@@ -65,3 +65,52 @@ Graph *Tester::loadGraphFromFile(std::string fileName)
     }
     return graph;
 }
+
+void Tester::runTests(std::string fileName, int stopTime, int crossoverMethod, int mutationMethod, float crossoverFactor, float mutationFactor, int populationSize)
+{
+    Graph *graph = loadGraphFromFile(fileName);
+    graph->setStopTime(stopTime);
+    std::cout << stopTime << '\n';
+    graph->setCrossoverMethod(crossoverMethod);
+    graph->setMutationMethod(mutationMethod);
+    graph->setCrossoverFactor(crossoverFactor);
+    graph->setMutationFactor(mutationFactor);
+    graph->setPopulationSize(populationSize);
+
+    std::cout << graph->getStopTime() << '\n';
+
+
+    std::cout << graph->getCrossoverProbability() << " " << graph-> getMutationProbability() << '\n';
+
+    std::cout << "Testing " << fileName << '\n';
+    for (int i = 0; i < numOfTests; i++)
+    {
+        std::cout << "Test " << i + 1 << '\n';
+        std::ofstream file(fileName + std::to_string(populationSize) + ".txt", std::ios_base::app);
+        std::vector <int> path;
+        int totalWeight = 0;
+        long time = 0;
+        graph->geneticMutation(path, totalWeight, time);
+        file << totalWeight << " " << time << '\n';
+
+        paths.push_back(path);
+        totalWeights.push_back(totalWeight);
+        times.push_back(time);
+        file.close();
+    }
+
+    std::ofstream file(fileName + ".txt", std::ios_base::app);
+    int minTotalWeightIndex = 0;
+    for (int i = 0; i < totalWeights.size(); i++)
+        if (totalWeights[i] < totalWeights[minTotalWeightIndex])
+            minTotalWeightIndex = i;
+    file << totalWeights[minTotalWeightIndex] << " ";
+    file << times[minTotalWeightIndex] << " ";
+    for (int i = 0; i < paths[minTotalWeightIndex].size(); i++)
+        file << paths[minTotalWeightIndex][i] << " ";
+    file << '\n';
+
+    file.close();
+    delete graph;
+}
+

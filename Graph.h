@@ -53,7 +53,7 @@ public:
     int getMutationMethod() const;
 
     // method to set the mutation probability
-    void setMutationProbability(float mutationProbability);
+    void setMutationFactor(float mutationProbability);
 
     // method to set the stop time
     void setStopTime(int stopTime);
@@ -76,12 +76,18 @@ public:
     // method to create initial population
     std::vector<std::vector<int>> createInitialPopulation(int populationSize, int& totalWeight);
 
+    // method to calculate costs of paths in population
+    std::vector<int> calculateCosts(std::vector<std::vector<int>> &population);
+
+    // method to get the best path in population
+    std::vector<int> getBestPath(std::vector<std::vector<int>> &population, std::vector<int> &costs);
+
     // method to sort population
     void sortPopulation(std::vector<std::vector<int>> &population);
 
     void setPopulationSize(int populationSize);
 
-    void setCrossoverProbability(float crossoverProbability);
+    void setCrossoverFactor(float crossoverProbability);
 
     void setCrossoverMethod(int crossoverMethod);
 
@@ -112,11 +118,11 @@ private:
     // neighborhood choice
     int neighborhoodChoice = 1;
 
-    // mutation probability
-    float mutationProbability = 0.01;
+    // mutationFactor
+    float mutationFactor = 0.01;
 
-    // crossover probability
-    float crossoverProbability = 0.8;
+    // crossover
+    float crossoverFactor = 0.8;
 
     // population size
     int populationSize = 50;
