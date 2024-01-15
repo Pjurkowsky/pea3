@@ -172,9 +172,23 @@ bool Menu::run()
                 {
                     Tester tester(5);
                     int populationSize = getIntInput("Enter population size: ");
-                    tester.runTests("ftv47.atsp", 120, 1, 1, 0.8, 0.01, populationSize);
-                    tester.runTests("ftv170.atsp", 240, 1, 1, 0.8, 0.01, populationSize);
-                    tester.runTests("rbg403.atsp", 360, 1, 1, 0.8, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240,1, 1, 0.5, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240,1, 2, 0.5, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240,2, 1, 0.5, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240,2, 2, 0.5, 0.01, populationSize);
+
+                    tester.runTests("ftv170.atsp", 240,1, 1, 0.7, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240,1, 2, 0.7, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240,2, 1, 0.7, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240,2, 2, 0.7, 0.01, populationSize);
+
+                    tester.runTests("ftv170.atsp", 240,1, 1, 0.9, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240,1, 2, 0.9, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240,2, 1, 0.9, 0.01, populationSize);
+                    tester.runTests("ftv170.atsp", 240,2, 2, 0.9, 0.01, populationSize);
+
+                    // tester.runTests("ftv170.atsp", 240, 1, 1, 0.8, 0.05, populationSize);
+                    // tester.runTests("ftv170.atsp", 240,1, 1, 0.8, 0.1, populationSize);
                 }
     
                 else if (chosenItemString == "display graph")

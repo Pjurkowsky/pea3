@@ -5,7 +5,7 @@
 #include <chrono>
 #include "utils/NeighborhoodSolver.cpp"
 #include "utils/RandomGenerator.h"
-
+#include <unordered_map>
 
 #ifndef GRAPH_H
 #define GRAPH_H

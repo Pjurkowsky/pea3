@@ -79,6 +79,9 @@ void Tester::runTests(std::string fileName, int stopTime, int crossoverMethod, i
 
     std::cout << graph->getStopTime() << '\n';
 
+    paths.clear();
+    totalWeights.clear();
+    times.clear();
 
     std::cout << graph->getCrossoverProbability() << " " << graph-> getMutationProbability() << '\n';
 
@@ -86,7 +89,7 @@ void Tester::runTests(std::string fileName, int stopTime, int crossoverMethod, i
     for (int i = 0; i < numOfTests; i++)
     {
         std::cout << "Test " << i + 1 << '\n';
-        std::ofstream file(fileName + std::to_string(populationSize) + ".txt", std::ios_base::app);
+        std::ofstream file(fileName + std::to_string(populationSize)+"x"  + std::to_string(graph->getCrossoverMethod()) + std::to_string(graph->getMutationMethod())  + "x" +std::to_string(graph->getMutationProbability()) + std::to_string(graph->getCrossoverProbability()) + ".txt", std::ios_base::app);
         std::vector <int> path;
         int totalWeight = 0;
         long time = 0;

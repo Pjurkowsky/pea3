@@ -239,21 +239,17 @@ std::vector<int> Graph::crossover(std::vector<int> &path1, std::vector<int> &pat
     int size = path1.size();
     std::vector<int> newPath(size, -1);
     RandomGenerator randomGenerator;
+    int crossoverPoint1 = randomGenerator.generateRandomInt(1, size - 2);
+    int crossoverPoint2 = randomGenerator.generateRandomInt(1, size - 2);
 
-    // write order crossover that dont touch first and last vertex
+    if (crossoverPoint1 > crossoverPoint2)
+        std::swap(crossoverPoint1, crossoverPoint2);
+
+    for (int i = crossoverPoint1; i <= crossoverPoint2; i++)
+        newPath[i] = path1[i];
+
     if (crossoverMethod == 1)
     {
-        int crossoverPoint1 = randomGenerator.generateRandomInt(1, size - 2);
-        int crossoverPoint2 = randomGenerator.generateRandomInt(1, size - 2);
-
-        if (crossoverPoint1 > crossoverPoint2)
-            std::swap(crossoverPoint1, crossoverPoint2);
-
-        for (int i = crossoverPoint1; i <= crossoverPoint2; i++)
-        {
-            newPath[i] = path1[i];
-        }
-
         int j = 0;
         for (int i = 0; i < size; i++)
         {
@@ -267,6 +263,27 @@ std::vector<int> Graph::crossover(std::vector<int> &path1, std::vector<int> &pat
         }
 
         newPath[size - 1] = newPath[0];
+    }
+    else if (crossoverMethod == 2) // partially mapped crossover
+    {
+        std::unordered_map<int, int> mapping;
+        for (int i = crossoverPoint1; i <= crossoverPoint2; ++i)
+        {
+            mapping[path1[i]] = path2[i];
+        }
+
+        for (int i = 0; i < size; ++i)
+        {
+            if (i < crossoverPoint1 || i > crossoverPoint2)
+            {
+                int value = path2[i];
+                while (mapping.find(value) != mapping.end())
+                {
+                    value = mapping[value];
+                }
+                newPath[i] = value;
+            }
+        }
     }
 
     return newPath;
@@ -349,6 +366,7 @@ void Graph::geneticMutation(std::vector<int> &path, int &totalWeight, long &time
     std::vector<std::vector<int>> population;
     std::vector<int> populationCosts;
 
+    //
     population = createInitialPopulation(populationSize, totalWeight);
     populationCosts = calculateCosts(population);
 
@@ -398,6 +416,8 @@ void Graph::geneticMutation(std::vector<int> &path, int &totalWeight, long &time
             mutation(newPopulation[index]);
         }
 
+        populationCosts = calculateCosts(newPopulation);
+
         population = newPopulation;
         bestPath = getBestPath(population, populationCosts);
 
@@ -407,9 +427,6 @@ void Graph::geneticMutation(std::vector<int> &path, int &totalWeight, long &time
         {
             totalWeight = getPathCost(bestPath);
             time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - currentTime).count();
-        //     printPath(bestPath);
-        //      std::cout << "Time: " << time << '\n';
-        //     std::cout << "Generation: " << generation << '\n';
-         }
+        }
     }
 }
